@@ -4,25 +4,25 @@ defmodule WikiView.Wiki.Page do
 
   @primary_key false
   schema "page" do
-    field :page_id, :integer, primary_key: true
-    field :page_content_model, :string
-    field :page_is_new, :string
-    field :page_is_redirect, :string
-    field :page_lang, :string
-    field :page_latest, :string
-    field :page_len, :string
-    field :page_links_updated, :string
-    field :page_namespace, :integer
-    field :page_random, :string
-    field :page_restrictions, :string
-    field :page_title, :string
-    field :page_touched, :string
+    field :id, :integer, primary_key: true, source: :page_id
+    field :content_model, :string, source: :page_content_model
+    field :is_new, :string, source: :page_is_new
+    field :is_redirect, :string, source: :page_is_redirect
+    field :language, :string, source: :page_lang
+    field :latest, :string, source: :page_latest
+    field :length, :string, source: :page_len
+    field :links_updated, :string, source: :page_links_updated
+    field :namespace, :integer, source: :page_namespace
+    field :random, :string, source: :page_random
+    field :restrictions, :string, source: :page_restrictions
+    field :title, :string, source: :page_title
+    field :touched, :string, source: :page_touched
   end
 
   @doc false
-  # def changeset(page, attrs) do
-  #   page
-  #   |> cast(attrs, [:page_namespace, :page_title, :page_restrictions, :page_is_redirect, :page_is_new, :page_random, :page_touched, :page_links_updated, :page_latest, :page_len, :page_content_model, :page_lang])
-  #   |> validate_required([:page_namespace, :page_title, :page_restrictions, :page_is_redirect, :page_is_new, :page_random, :page_touched, :page_links_updated, :page_latest, :page_len, :page_content_model, :page_lang])
-  # end
+  def changeset(page, attrs) do
+    page
+    |> cast(attrs, [:namespace, :title, :restrictions, :is_redirect, :is_new, :random, :touched, :links_updated, :latest, :len, :content_model, :language])
+    |> validate_required([:namespace, :title, :restrictions, :is_redirect, :is_new, :random, :touched, :links_updated, :latest, :length, :content_model, :language])
+  end
 end
