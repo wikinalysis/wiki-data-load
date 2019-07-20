@@ -16,7 +16,7 @@ defmodule WikiViewWeb.Router do
   scope "/", WikiViewWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", WikiController, :index
   end
 
   # Other scopes may use custom stacks.
