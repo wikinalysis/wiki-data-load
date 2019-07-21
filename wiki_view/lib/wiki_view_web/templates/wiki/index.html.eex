@@ -6,21 +6,28 @@
 <section class="column-9">
   <table>
     <tr>
-      <th>AI Name</th>
-      <th>Book</th>
+      <th>ID</th>
+      <th>Content Model</th>
+      <th>Is New</th>
+      <th>Is Redirect</th>
+      <th>Language</th>
+      <th>Latest</th>
+      <th>Length</th>
+      <th>Links Updated</th>
+      <th>Namespace</th>
     </tr>
 
     <%= for page <- @pages do %>
       <tr>
-        <td><%= page.page_id %></td>
-        <td><%= page.page_content_model %></td>
-        <td><%= page.page_is_new %></td>
-        <td><%= page.page_is_redirect %></td>
-        <td><%= page.page_lang %></td>
-        <td><%= page.page_latest %></td>
-        <td><%= page.page_len %></td>
-        <td><%= page.page_links_updated %></td>
-        <td><%= page.page_namespace %></td>
+        <td><%= page.id %></td>
+        <td><%= page.content_model %></td>
+        <td><%= page.is_new %></td>
+        <td><%= page.is_redirect %></td>
+        <td><%= page.language %></td>
+        <td><%= page.latest %></td>
+        <td><%= page.length %></td>
+        <td><%= page.links_updated %></td>
+        <td><%= page.namespace %></td>
       </tr>
     <% end %>
   </table>

@@ -29,55 +29,6 @@ defmodule WikiView.WikiTest do
       assert Wiki.get_page!(page.id) == page
     end
 
-    test "create_page/1 with valid data creates a page" do
-      assert {:ok, %Page{} = page} = Wiki.create_page(@valid_attrs)
-      assert page.page_content_model == "some page_content_model"
-      assert page.page_is_new == "some page_is_new"
-      assert page.page_is_redirect == "some page_is_redirect"
-      assert page.page_lang == "some page_lang"
-      assert page.page_latest == "some page_latest"
-      assert page.page_len == "some page_len"
-      assert page.page_links_updated == "some page_links_updated"
-      assert page.page_namespace == 42
-      assert page.page_random == "some page_random"
-      assert page.page_restrictions == "some page_restrictions"
-      assert page.page_title == "some page_title"
-      assert page.page_touched == "some page_touched"
-    end
-
-    test "create_page/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Wiki.create_page(@invalid_attrs)
-    end
-
-    test "update_page/2 with valid data updates the page" do
-      page = page_fixture()
-      assert {:ok, %Page{} = page} = Wiki.update_page(page, @update_attrs)
-      assert page.page_content_model == "some updated page_content_model"
-      assert page.page_is_new == "some updated page_is_new"
-      assert page.page_is_redirect == "some updated page_is_redirect"
-      assert page.page_lang == "some updated page_lang"
-      assert page.page_latest == "some updated page_latest"
-      assert page.page_len == "some updated page_len"
-      assert page.page_links_updated == "some updated page_links_updated"
-      assert page.page_namespace == 43
-      assert page.page_random == "some updated page_random"
-      assert page.page_restrictions == "some updated page_restrictions"
-      assert page.page_title == "some updated page_title"
-      assert page.page_touched == "some updated page_touched"
-    end
-
-    test "update_page/2 with invalid data returns error changeset" do
-      page = page_fixture()
-      assert {:error, %Ecto.Changeset{}} = Wiki.update_page(page, @invalid_attrs)
-      assert page == Wiki.get_page!(page.id)
-    end
-
-    test "delete_page/1 deletes the page" do
-      page = page_fixture()
-      assert {:ok, %Page{}} = Wiki.delete_page(page)
-      assert_raise Ecto.NoResultsError, fn -> Wiki.get_page!(page.id) end
-    end
-
     test "change_page/1 returns a page changeset" do
       page = page_fixture()
       assert %Ecto.Changeset{} = Wiki.change_page(page)
@@ -110,59 +61,6 @@ defmodule WikiView.WikiTest do
       assert Wiki.get_revision!(revision.id) == revision
     end
 
-    test "create_revision/1 with valid data creates a revision" do
-      assert {:ok, %Revision{} = revision} = Wiki.create_revision(@valid_attrs)
-      assert revision.rev_comment == "some rev_comment"
-      assert revision.rev_content_format == "some rev_content_format"
-      assert revision.rev_content_model == "some rev_content_model"
-      assert revision.rev_deleted == "some rev_deleted"
-      assert revision.rev_id == "some rev_id"
-      assert revision.rev_len == "some rev_len"
-      assert revision.rev_minor_edit == "some rev_minor_edit"
-      assert revision.rev_page == "some rev_page"
-      assert revision.rev_parent_id == "some rev_parent_id"
-      assert revision.rev_sha1 == "some rev_sha1"
-      assert revision.rev_text_id == "some rev_text_id"
-      assert revision.rev_timestamp == "some rev_timestamp"
-      assert revision.rev_user == "some rev_user"
-      assert revision.rev_user_text == "some rev_user_text"
-    end
-
-    test "create_revision/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Wiki.create_revision(@invalid_attrs)
-    end
-
-    test "update_revision/2 with valid data updates the revision" do
-      revision = revision_fixture()
-      assert {:ok, %Revision{} = revision} = Wiki.update_revision(revision, @update_attrs)
-      assert revision.rev_comment == "some updated rev_comment"
-      assert revision.rev_content_format == "some updated rev_content_format"
-      assert revision.rev_content_model == "some updated rev_content_model"
-      assert revision.rev_deleted == "some updated rev_deleted"
-      assert revision.rev_id == "some updated rev_id"
-      assert revision.rev_len == "some updated rev_len"
-      assert revision.rev_minor_edit == "some updated rev_minor_edit"
-      assert revision.rev_page == "some updated rev_page"
-      assert revision.rev_parent_id == "some updated rev_parent_id"
-      assert revision.rev_sha1 == "some updated rev_sha1"
-      assert revision.rev_text_id == "some updated rev_text_id"
-      assert revision.rev_timestamp == "some updated rev_timestamp"
-      assert revision.rev_user == "some updated rev_user"
-      assert revision.rev_user_text == "some updated rev_user_text"
-    end
-
-    test "update_revision/2 with invalid data returns error changeset" do
-      revision = revision_fixture()
-      assert {:error, %Ecto.Changeset{}} = Wiki.update_revision(revision, @invalid_attrs)
-      assert revision == Wiki.get_revision!(revision.id)
-    end
-
-    test "delete_revision/1 deletes the revision" do
-      revision = revision_fixture()
-      assert {:ok, %Revision{}} = Wiki.delete_revision(revision)
-      assert_raise Ecto.NoResultsError, fn -> Wiki.get_revision!(revision.id) end
-    end
-
     test "change_revision/1 returns a revision changeset" do
       revision = revision_fixture()
       assert %Ecto.Changeset{} = Wiki.change_revision(revision)
@@ -193,37 +91,6 @@ defmodule WikiView.WikiTest do
     test "get_text!/1 returns the text with given id" do
       text = text_fixture()
       assert Wiki.get_text!(text.id) == text
-    end
-
-    test "create_text/1 with valid data creates a text" do
-      assert {:ok, %Text{} = text} = Wiki.create_text(@valid_attrs)
-      assert text.old_flags == "some old_flags"
-      assert text.old_id == "some old_id"
-      assert text.old_text == "some old_text"
-    end
-
-    test "create_text/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Wiki.create_text(@invalid_attrs)
-    end
-
-    test "update_text/2 with valid data updates the text" do
-      text = text_fixture()
-      assert {:ok, %Text{} = text} = Wiki.update_text(text, @update_attrs)
-      assert text.old_flags == "some updated old_flags"
-      assert text.old_id == "some updated old_id"
-      assert text.old_text == "some updated old_text"
-    end
-
-    test "update_text/2 with invalid data returns error changeset" do
-      text = text_fixture()
-      assert {:error, %Ecto.Changeset{}} = Wiki.update_text(text, @invalid_attrs)
-      assert text == Wiki.get_text!(text.id)
-    end
-
-    test "delete_text/1 deletes the text" do
-      text = text_fixture()
-      assert {:ok, %Text{}} = Wiki.delete_text(text)
-      assert_raise Ecto.NoResultsError, fn -> Wiki.get_text!(text.id) end
     end
 
     test "change_text/1 returns a text changeset" do

@@ -17,8 +17,10 @@ defmodule WikiView.Wiki do
       [%Page{}, ...]
 
   """
-  def list_page do
-    Repo.all(Page)
+  def list_page(opts \\ %{}) do
+    default = %{limit: 50, offset: 0}
+    options = Map.merge(default, opts)
+    Repo.all(from p in Page, limit: ^options.limit, offset: ^options.offset)
   end
 
   @doc """
@@ -35,58 +37,10 @@ defmodule WikiView.Wiki do
       ** (Ecto.NoResultsError)
 
   """
-  def get_page!(id), do: Repo.get!(Page, id)
-
-  @doc """
-  Creates a page.
-
-  ## Examples
-
-      iex> create_page(%{field: value})
-      {:ok, %Page{}}
-
-      iex> create_page(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_page(attrs \\ %{}) do
-    %Page{}
-    |> Page.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a page.
-
-  ## Examples
-
-      iex> update_page(page, %{field: new_value})
-      {:ok, %Page{}}
-
-      iex> update_page(page, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_page(%Page{} = page, attrs) do
-    page
-    |> Page.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a Page.
-
-  ## Examples
-
-      iex> delete_page(page)
-      {:ok, %Page{}}
-
-      iex> delete_page(page)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_page(%Page{} = page) do
-    Repo.delete(page)
+  def get_page!(id) do
+    Page
+    |> preload([:revision, :text])
+    |> Repo.get!(id)
   end
 
   @doc """
@@ -134,58 +88,6 @@ defmodule WikiView.Wiki do
   def get_revision!(id), do: Repo.get!(Revision, id)
 
   @doc """
-  Creates a revision.
-
-  ## Examples
-
-      iex> create_revision(%{field: value})
-      {:ok, %Revision{}}
-
-      iex> create_revision(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_revision(attrs \\ %{}) do
-    %Revision{}
-    |> Revision.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a revision.
-
-  ## Examples
-
-      iex> update_revision(revision, %{field: new_value})
-      {:ok, %Revision{}}
-
-      iex> update_revision(revision, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_revision(%Revision{} = revision, attrs) do
-    revision
-    |> Revision.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a Revision.
-
-  ## Examples
-
-      iex> delete_revision(revision)
-      {:ok, %Revision{}}
-
-      iex> delete_revision(revision)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_revision(%Revision{} = revision) do
-    Repo.delete(revision)
-  end
-
-  @doc """
   Returns an `%Ecto.Changeset{}` for tracking revision changes.
 
   ## Examples
@@ -228,58 +130,6 @@ defmodule WikiView.Wiki do
 
   """
   def get_text!(id), do: Repo.get!(Text, id)
-
-  @doc """
-  Creates a text.
-
-  ## Examples
-
-      iex> create_text(%{field: value})
-      {:ok, %Text{}}
-
-      iex> create_text(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_text(attrs \\ %{}) do
-    %Text{}
-    |> Text.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a text.
-
-  ## Examples
-
-      iex> update_text(text, %{field: new_value})
-      {:ok, %Text{}}
-
-      iex> update_text(text, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_text(%Text{} = text, attrs) do
-    text
-    |> Text.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a Text.
-
-  ## Examples
-
-      iex> delete_text(text)
-      {:ok, %Text{}}
-
-      iex> delete_text(text)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_text(%Text{} = text) do
-    Repo.delete(text)
-  end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking text changes.

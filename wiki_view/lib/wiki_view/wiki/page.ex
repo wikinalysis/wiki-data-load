@@ -8,15 +8,18 @@ defmodule WikiView.Wiki.Page do
     field :namespace, :integer, source: :page_namespace
     field :title, :string, source: :page_title
     field :restrictions, :string, source: :page_restrictions
-    field :is_redirect, :string, source: :page_is_redirect
-    field :is_new, :string, source: :page_is_new
-    field :random, :string, source: :page_random
+    field :is_redirect, :integer, source: :page_is_redirect
+    field :is_new, :integer, source: :page_is_new
+    field :random, :float, source: :page_random
     field :touched, :string, source: :page_touched
     field :links_updated, :string, source: :page_links_updated
-    field :latest, :string, source: :page_latest
-    field :length, :string, source: :page_len
+    field :latest, :integer, source: :page_latest
+    field :length, :integer, source: :page_len
     field :content_model, :string, source: :page_content_model
     field :language, :string, source: :page_lang
+
+    has_many :revision, WikiView.Wiki.Revision, foreign_key: :page_id, references: :id
+    has_many :text, through: [:revision, :text], references: :id
   end
 
   @doc false
