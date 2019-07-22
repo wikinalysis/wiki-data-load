@@ -7,6 +7,8 @@ defmodule WikiView.Wiki do
   alias WikiView.Repo
 
   alias WikiView.Wiki.Page
+  alias WikiView.Wiki.Revision
+  alias WikiView.Wiki.Text
 
   @doc """
   Returns the list of page.
@@ -56,7 +58,23 @@ defmodule WikiView.Wiki do
     Page.changeset(page, %{})
   end
 
-  alias WikiView.Wiki.Revision
+  def create_page(attrs \\ %{}) do
+    %Page{}
+    |> Page.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_text(attrs \\ %{}) do
+    %Text{}
+    |> Text.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_revision(attrs \\ %{}) do
+    %Revision{}
+    |> Revision.changeset(attrs)
+    |> Repo.insert()
+  end
 
   @doc """
   Returns the list of revisions.

@@ -18,14 +18,37 @@ defmodule WikiView.Wiki.Revision do
     field :content_model, :string, source: :rev_content_model
     field :content_format, :string, source: :rev_content_format
 
-    belongs_to :page, WikiView.Wiki.Page, foreign_key: :page_id, references: :id, source: :rev_page
-    belongs_to :text, WikiView.Wiki.Text, foreign_key: :text_id, references: :id, source: :rev_text_id
+    belongs_to :page, WikiView.Wiki.Page,
+      foreign_key: :page_id,
+      references: :id,
+      source: :rev_page
+
+    belongs_to :text, WikiView.Wiki.Text,
+      foreign_key: :text_id,
+      references: :id,
+      source: :rev_text_id
   end
+
+  @attrs [
+    :id,
+    :page_id,
+    :text_id,
+    :comment,
+    :user,
+    :user_text,
+    :timestamp,
+    :minor_edit,
+    :deleted,
+    :length,
+    :parent_id,
+    :sha1,
+    :content_model,
+    :content_format
+  ]
 
   @doc false
   def changeset(revision, attrs) do
     revision
-    |> cast(attrs, [:id, :page, :text_id, :comment, :user, :user_text, :timestamp, :minor_edit, :deleted, :length, :parent_id, :sha1, :content_model, :content_format])
-    |> validate_required([:id, :page, :text_id, :comment, :user, :user_text, :timestamp, :minor_edit, :deleted, :length, :parent_id, :sha1, :content_model, :content_format])
+    |> cast(attrs, @attrs)
   end
 end
