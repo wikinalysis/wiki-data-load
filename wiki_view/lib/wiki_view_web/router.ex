@@ -13,17 +13,17 @@ defmodule WikiViewWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/api", WikiViewWeb do
+    pipe_through :api
+
+    get "/:id", WikiApiController, :show
+    get "/", WikiApiController, :index
+  end
+
   scope "/", WikiViewWeb do
     pipe_through :browser
 
-    get "/:id", WikiController, :get
+    get "/:id", WikiController, :show
     get "/", WikiController, :index
   end
-
-  # scope "/api", WikiViewWeb do
-  #   pipe_through :api
-
-  #   get "/:id", WikiController, :get
-  #   get "/", WikiController, :index
-  # end
 end

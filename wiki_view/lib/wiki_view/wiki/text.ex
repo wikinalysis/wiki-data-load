@@ -3,6 +3,7 @@ defmodule WikiView.Wiki.Text do
   import Ecto.Changeset
 
   @primary_key false
+  @derive {Jason.Encoder, except: [:__meta__]}
   schema "text" do
     field :id, :integer, primary_key: true, source: :old_id
     field :text, :string, source: :old_text

@@ -3,6 +3,7 @@ defmodule WikiView.Wiki.Revision do
   import Ecto.Changeset
 
   @primary_key false
+  @derive {Jason.Encoder, except: [:__meta__]}
   schema "revision" do
     field :id, :integer, primary_key: true, source: :rev_id
     field :comment, :string, source: :rev_comment

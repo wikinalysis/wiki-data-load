@@ -3,6 +3,7 @@ defmodule WikiView.Wiki.Page do
   import Ecto.Changeset
 
   @primary_key false
+  @derive {Jason.Encoder, except: [:__meta__, :revision, :text]}
   schema "page" do
     field :id, :integer, primary_key: true, source: :page_id
     field :namespace, :integer, source: :page_namespace
