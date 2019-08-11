@@ -2,17 +2,26 @@ package wiki;
 
 import javax.xml.bind.annotation.*;
 
+import org.apache.avro.reflect.Nullable;
+
 @XmlRootElement(name = "revision")
 public class Revision {
+
     public Integer id;
-    public Integer parentId;
     public String timestamp;
-    public String comment;
     public String model;
     public String format;
     public String sha1;
     // public String text;
+    // public Contributor contributor;
+
+    @Nullable
+    public Integer parentId;
+
+    @Nullable
     public String minor;
-    public Contributor contributor;
+
+    @Nullable
+    public String comment;
 
 }

@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
+import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
@@ -21,6 +22,7 @@ public class Identity {
 
     static String ROOT_ELEMENT = "mediawiki";
     static String RECORD_ELEMENT = "page";
+    private static PCollection<PageDecorator> setCoder;
 
     public interface IdentityOptions extends PipelineOptions {
         @Description("Path of the file to read from")
@@ -48,7 +50,6 @@ public class Identity {
     public static class DecoratePagesFn extends SimpleFunction<Page, PageDecorator> {
         private static final long serialVersionUID = 1L;
 
-        @Override
         public PageDecorator apply(Page input) {
             return PageDecoratorFactory.create(input);
         }
@@ -66,7 +67,10 @@ public class Identity {
         PCollection<Page> input = pipeline.apply("Read XML", xmlRead).apply("Filter Namespaces",
                 Filter.by(new ArticleNamespaceFilterFn()));
 
-        input.apply("Add Attributes", MapElements.via(new DecoratePagesFn())).apply("Write XML", xmlWrite);
+        setCoder = input.apply("Add Attributes", MapElements.via(new DecoratePagesFn()))
+                .setCoder(AvroCoder.of(PageDecorator.class));
+
+        setCoder.apply("Write XML", xmlWrite);
 
         PipelineResult result = pipeline.run();
 
