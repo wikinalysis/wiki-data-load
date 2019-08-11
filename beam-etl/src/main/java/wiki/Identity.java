@@ -1,14 +1,11 @@
 package wiki;
 
-import wiki.Page;
-
-import org.apache.beam.sdk.io.xml.XmlIO;
-
 import java.io.IOException;
 
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.AvroCoder;
+import org.apache.beam.sdk.io.xml.XmlIO;
 import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
@@ -18,15 +15,18 @@ import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.SimpleFunction;
 import org.apache.beam.sdk.values.PCollection;
 
+import wiki.models.WikiPage;
+import wiki.models.Page;
+
 public class Identity {
 
     static String ROOT_ELEMENT = "mediawiki";
     static String RECORD_ELEMENT = "page";
-    private static PCollection<PageDecorator> setCoder;
+    private static PCollection<Page> setCoder;
 
     public interface IdentityOptions extends PipelineOptions {
         @Description("Path of the file to read from")
-        @Default.String("../tnwiki-20190720-pages-articles-multistream.xml")
+        @Default.String("../tnwiki-20190801-pages-meta-history.xml")
         String getInputFile();
 
         void setInputFile(String value);
@@ -38,37 +38,37 @@ public class Identity {
         void setOutput(String value);
     }
 
-    public static class ArticleNamespaceFilterFn extends SimpleFunction<Page, Boolean> {
+    public static class ArticleNamespaceFilterFn extends SimpleFunction<WikiPage, Boolean> {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public Boolean apply(Page input) {
+        public Boolean apply(WikiPage input) {
             return input.ns == 0;
         }
     }
 
-    public static class DecoratePagesFn extends SimpleFunction<Page, PageDecorator> {
+    public static class DecoratePagesFn extends SimpleFunction<WikiPage, Page> {
         private static final long serialVersionUID = 1L;
 
-        public PageDecorator apply(Page input) {
-            return PageDecoratorFactory.create(input);
+        public Page apply(WikiPage input) {
+            return WikiConverters.convertPage.apply(input);
         }
     }
 
     static void runIdentity(IdentityOptions options) throws IOException {
         Pipeline pipeline = Pipeline.create(options);
 
-        XmlIO.Read<Page> xmlRead = XmlIO.<Page>read().from(options.getInputFile()).withRootElement(ROOT_ELEMENT)
-                .withRecordElement(RECORD_ELEMENT).withRecordClass(Page.class);
+        XmlIO.Read<WikiPage> xmlRead = XmlIO.<WikiPage>read().from(options.getInputFile()).withRootElement(ROOT_ELEMENT)
+                .withRecordElement(RECORD_ELEMENT).withRecordClass(WikiPage.class);
 
-        XmlIO.Write<PageDecorator> xmlWrite = XmlIO.<PageDecorator>write().withRootElement(ROOT_ELEMENT)
-                .withRecordClass(PageDecorator.class).to(options.getOutput());
+        XmlIO.Write<Page> xmlWrite = XmlIO.<Page>write().withRootElement(ROOT_ELEMENT).withRecordClass(Page.class)
+                .to(options.getOutput());
 
-        PCollection<Page> input = pipeline.apply("Read XML", xmlRead).apply("Filter Namespaces",
+        PCollection<WikiPage> input = pipeline.apply("Read XML", xmlRead).apply("Filter Namespaces",
                 Filter.by(new ArticleNamespaceFilterFn()));
 
         setCoder = input.apply("Add Attributes", MapElements.via(new DecoratePagesFn()))
-                .setCoder(AvroCoder.of(PageDecorator.class));
+                .setCoder(AvroCoder.of(Page.class));
 
         setCoder.apply("Write XML", xmlWrite);
 

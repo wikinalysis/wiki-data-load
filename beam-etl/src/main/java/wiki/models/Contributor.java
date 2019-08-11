@@ -1,9 +1,9 @@
-package wiki;
+package wiki.models;
 
 import javax.xml.bind.annotation.*;
 
 @XmlRootElement(name = "contributor")
-class Contributor {
+public class Contributor {
     public Integer id;
     public String username;
 }
