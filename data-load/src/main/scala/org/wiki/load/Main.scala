@@ -30,7 +30,7 @@ object WordCount {
     var xmlWrite = XmlIO.write().withRootElement(ROOT_ELEMENT).withRecordClass(classOf[Page]).to(options.getOutput)
 
     pipeline.apply("ReadFiles", xmlRead)
-      .apply("Filter Article Namespaces", Filter.by(new NamespaceFilter))
+      // .apply("Filter Namespace", new NamespaceFilter)
       .apply("Transform Elements", MapElements.via(new ProcessPage))
       .apply("WriteWords", xmlWrite)
 
@@ -43,7 +43,7 @@ object WordCount {
 trait WordCountOptions extends PipelineOptions {
 
   @Description("Path of the file to read from")
-  @Default.String("tnwiki-20190801-pages-meta-history.xml.bz2")
+  @Default.String("tnwiki-20190720-pages-articles-multistream.xml.bz2")
   def getInputFile: String
   def setInputFile(path: String)
 

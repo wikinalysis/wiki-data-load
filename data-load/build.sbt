@@ -7,14 +7,13 @@ version := "1.0-SNAPSHOT"
 scalaVersion := "2.12.4"
 
 lazy val scalaMainVersion = "2.12"
-lazy val beamVersion = "2.1.0"
+lazy val beamVersion = "2.15.0"
 lazy val slf4jVersion = "1.7.25"
 lazy val scalaTestVersion = "3.0.4"
 lazy val javaxVersion = "2.2.11"
 
 libraryDependencies ++= Seq(
   "io.scalaland" %% "chimney" % "0.3.2",
-  "org.apache.beam" % "beam-runners-google-cloud-dataflow-java" % beamVersion,
   "org.apache.beam" % "beam-runners-direct-java" % beamVersion,
   "org.apache.beam" % "beam-sdks-java-io-xml" % beamVersion,
   "javax.xml.bind" % "jaxb-api" % javaxVersion,
