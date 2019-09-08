@@ -2,6 +2,7 @@ package org.wiki.load
 
 import java.lang
 
+import com.spotify.scio._
 import org.apache.beam.sdk.Pipeline
 import org.apache.beam.sdk.io.xml.XmlIO;
 import org.apache.beam.sdk.options.Validation.Required
@@ -13,21 +14,19 @@ import javax.xml.bind.annotation.{XmlRootElement, XmlAccessorType, XmlAccessType
 
 object WordCount {
 
-  def main(args: Array[String]): Unit = {
+  def main(cmdlineArgs: Array[String]): Unit = {
+    val (opts, args) = ScioContext.parseArguments[PipelineOptions](cmdlineArgs)
 
     val RECORD_ELEMENT = "page";
     val ROOT_ELEMENT = "mediawiki";
+    val INPUT_FILE = args.getOrElse("inputFile", "tnwiki-20190720-pages-articles-multistream.xml.bz2")
+    val OUTPUT = args.getOrElse("output", "tmp/output")
 
-    val options = PipelineOptionsFactory
-      .fromArgs(args: _*)
-      .withValidation()
-      .as(classOf[WordCountOptions])
+    var pipeline = Pipeline.create(opts)
 
-    var pipeline = Pipeline.create(options)
+    var xmlRead = XmlIO.read().from(INPUT_FILE).withRootElement(ROOT_ELEMENT).withRecordElement(RECORD_ELEMENT).withRecordClass(classOf[WikiPage])
 
-    var xmlRead = XmlIO.read().from(options.getInputFile).withRootElement(ROOT_ELEMENT).withRecordElement(RECORD_ELEMENT).withRecordClass(classOf[WikiPage])
-
-    var xmlWrite = XmlIO.write().withRootElement(ROOT_ELEMENT).withRecordClass(classOf[Page]).to(options.getOutput)
+    var xmlWrite = XmlIO.write().withRootElement(ROOT_ELEMENT).withRecordClass(classOf[Page]).to(OUTPUT)
 
     pipeline.apply("ReadFiles", xmlRead)
       // .apply("Filter Namespace", new NamespaceFilter)
@@ -40,19 +39,19 @@ object WordCount {
 
 // ======================================= Options =============================================
 
-trait WordCountOptions extends PipelineOptions {
+// trait WordCountOptions extends PipelineOptions {
 
-  @Description("Path of the file to read from")
-  @Default.String("tnwiki-20190720-pages-articles-multistream.xml.bz2")
-  def getInputFile: String
-  def setInputFile(path: String)
+//   @Description("Path of the file to read from")
+//   @Default.String("tnwiki-20190720-pages-articles-multistream.xml.bz2")
+//   def getInputFile: String
+//   def setInputFile(path: String)
 
-  @Description("Path of the file to write to")
-  @Default.String("tmp/output")
-  def getOutput: String
-  def setOutput(path: String)
+//   @Description("Path of the file to write to")
+//   @Default.String("tmp/output")
+//   def getOutput: String
+//   def setOutput(path: String)
 
-}
+// }
 
 // ==== Wiki Classes ====
 @XmlRootElement(name = "page")

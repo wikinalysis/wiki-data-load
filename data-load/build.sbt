@@ -11,9 +11,12 @@ lazy val beamVersion = "2.15.0"
 lazy val slf4jVersion = "1.7.25"
 lazy val scalaTestVersion = "3.0.4"
 lazy val javaxVersion = "2.2.11"
+lazy val scioVersion = "0.7.4"
 
 libraryDependencies ++= Seq(
   "io.scalaland" %% "chimney" % "0.3.2",
+  "com.spotify" %% "scio-core" % scioVersion,
+  "com.spotify" %% "scio-test" % scioVersion % "test",
   "org.apache.beam" % "beam-runners-direct-java" % beamVersion,
   "org.apache.beam" % "beam-sdks-java-io-xml" % beamVersion,
   "javax.xml.bind" % "jaxb-api" % javaxVersion,
