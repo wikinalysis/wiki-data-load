@@ -7,7 +7,7 @@ version := "1.0-SNAPSHOT"
 scalaVersion := "2.12.4"
 
 lazy val scalaMainVersion = "2.12"
-lazy val beamVersion = "2.15.0"
+lazy val beamVersion = "2.11.0"
 lazy val slf4jVersion = "1.7.25"
 lazy val scalaTestVersion = "3.0.4"
 lazy val javaxVersion = "2.2.11"

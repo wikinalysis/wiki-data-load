@@ -3,12 +3,14 @@ package org.wiki.load
 import java.lang
 
 import com.spotify.scio._
+import com.spotify.scio.values.SCollection
 import org.apache.beam.sdk.Pipeline
 import org.apache.beam.sdk.io.xml.XmlIO;
 import org.apache.beam.sdk.options.Validation.Required
 import org.apache.beam.sdk.options.{Default, Description, PipelineOptions, PipelineOptionsFactory}
 import org.apache.beam.sdk.transforms.DoFn.ProcessElement
-import org.apache.beam.sdk.transforms.{MapElements, Filter, SimpleFunction}
+import org.apache.beam.sdk.transforms.{MapElements, Filter, SimpleFunction, PTransform}
+import org.apache.beam.sdk.values._
 import org.apache.beam.sdk.values.{KV, PCollection}
 import javax.xml.bind.annotation.{XmlRootElement, XmlAccessorType, XmlAccessType, XmlElement}
 
@@ -19,39 +21,51 @@ object WordCount {
 
     val RECORD_ELEMENT = "page";
     val ROOT_ELEMENT = "mediawiki";
+    val ARTICLE_NAMESPACE = 0
     val INPUT_FILE = args.getOrElse("inputFile", "tnwiki-20190720-pages-articles-multistream.xml.bz2")
     val OUTPUT = args.getOrElse("output", "tmp/output")
 
-    var pipeline = Pipeline.create(opts)
+    val sc = ScioContext(opts)
+
+    var pipeline: Pipeline = sc.pipeline
 
     var xmlRead = XmlIO.read().from(INPUT_FILE).withRootElement(ROOT_ELEMENT).withRecordElement(RECORD_ELEMENT).withRecordClass(classOf[WikiPage])
 
-    var xmlWrite = XmlIO.write().withRootElement(ROOT_ELEMENT).withRecordClass(classOf[Page]).to(OUTPUT)
+    var xmlWrite: PTransform[PCollection[Page], PDone] = XmlIO.write().withRootElement(ROOT_ELEMENT).withRecordClass(classOf[Page]).to(OUTPUT)
 
-    pipeline.apply("ReadFiles", xmlRead)
-      // .apply("Filter Namespace", new NamespaceFilter)
-      .apply("Transform Elements", MapElements.via(new ProcessPage))
-      .apply("WriteWords", xmlWrite)
+    // var transformPages: PTransform[PCollection[WikiPage], PCollection[Page]] = MapElements.via(new ProcessPage)
 
-    pipeline.run().waitUntilFinish()
+    sc
+      .customInput("fromXML", xmlRead)
+      .filter((v: WikiPage) => v.ns == ARTICLE_NAMESPACE)
+      .map(WikiTransforms.transformPage)
+      .saveAsCustomOutput("toXML", xmlWrite)
+
+    // pipeline.apply("ReadFiles", xmlRead)
+    //   // .apply("Filter Namespace", new NamespaceFilter)
+    //   .apply("Transform Elements", MapElements.via(new ProcessPage))
+    //   .apply("WriteWords", xmlWrite)
+
+    sc.pipeline.run().waitUntilFinish()
   }
 }
 
-// ======================================= Options =============================================
+// ======================================= Transforms =============================================
 
-// trait WordCountOptions extends PipelineOptions {
+object WikiTransforms {
+  def transformPage(input: WikiPage): Page = {
+    Page(id=input.id, namespace=input.ns, title=input.title, revisionCount=input.revision.length, revision=input.revision.map(rev => transformRevision(rev)))
+  }
 
-//   @Description("Path of the file to read from")
-//   @Default.String("tnwiki-20190720-pages-articles-multistream.xml.bz2")
-//   def getInputFile: String
-//   def setInputFile(path: String)
+  def transformRevision(input: WikiRevision): Revision = {
+    Revision(id=input.id, timestamp=input.timestamp, sha1=input.sha1, textLength=input.text.length, text=input.text, contributor=transformContributor(input.contributor))
+  }
 
-//   @Description("Path of the file to write to")
-//   @Default.String("tmp/output")
-//   def getOutput: String
-//   def setOutput(path: String)
+  def transformContributor(input: WikiContributor): WikiContributor = {
+    input
+  }
 
-// }
+}
 
 // ==== Wiki Classes ====
 @XmlRootElement(name = "page")
@@ -83,48 +97,4 @@ case class Page(id: Int, namespace: Int, title: String, revisionCount: Int, @Xml
 @XmlAccessorType(XmlAccessType.FIELD)
 case class Revision(id: Int, timestamp: String, sha1: String, textLength: Int, text: String, contributor: WikiContributor) {
   def this() = this(id=0, timestamp="", sha1="", textLength=0, text="", contributor=new WikiContributor)
-}
-
-// ======================================== UDFs ===============================================
-
-
-class ProcessPage extends SimpleFunction[WikiPage, Page] {
-  override def apply(input: WikiPage): Page = {
-    Page(id=input.id, namespace=input.ns, title=input.title, revisionCount=input.revision.length, revision=processRevisions(input.revision))
-  }
-
-  private def processRevisions(input: Array[WikiRevision]): Array[Revision] = {
-    val size = input.length
-    val newRevisions = new Array[Revision](size)
-    var j = 0
-    while (j < size) {
-      newRevisions(j) = processRevision(input(j))
-      j += 1
-    }
-    newRevisions
-  }
-
-  private def processRevision(input: WikiRevision): Revision = {
-    Revision(id=input.id, timestamp=input.timestamp, sha1=input.sha1, textLength=input.text.length, text=input.text, contributor=input.contributor)
-  }
-
-  private def identity[P](in: P): P = { in }
-}
-
-// class ProcessRevision extends SimpleFunction[WikiRevision, WikiRevision] {
-//   override def apply(input: WikiRevision): WikiRevision = {
-//     input
-//   }
-// }
-
-class ProcessContributor extends SimpleFunction[WikiContributor, WikiContributor] {
-  override def apply(input: WikiContributor): WikiContributor = {
-    input
-  }
-}
-
-class NamespaceFilter extends SimpleFunction[Any, Boolean] {
-  override def apply(input: Any): Boolean = {
-    true
-  }
 }
