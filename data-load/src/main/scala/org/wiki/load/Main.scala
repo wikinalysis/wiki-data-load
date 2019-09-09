@@ -41,11 +41,6 @@ object WordCount {
       .map(WikiTransforms.transformPage)
       .saveAsCustomOutput("toXML", xmlWrite)
 
-    // pipeline.apply("ReadFiles", xmlRead)
-    //   // .apply("Filter Namespace", new NamespaceFilter)
-    //   .apply("Transform Elements", MapElements.via(new ProcessPage))
-    //   .apply("WriteWords", xmlWrite)
-
     sc.pipeline.run().waitUntilFinish()
   }
 }
@@ -64,7 +59,6 @@ object WikiTransforms {
   def transformContributor(input: WikiContributor): WikiContributor = {
     input
   }
-
 }
 
 // ==== Wiki Classes ====
