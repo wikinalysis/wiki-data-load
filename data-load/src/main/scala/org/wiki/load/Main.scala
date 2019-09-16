@@ -1,18 +1,15 @@
 package org.wiki.load
 
-import java.lang
+import java.io.{BufferedInputStream, BufferedReader, FileInputStream, InputStreamReader}
 
 import com.spotify.scio._
 import com.spotify.scio.values.SCollection
-import org.apache.beam.sdk.Pipeline
-import org.apache.beam.sdk.io.xml.XmlIO;
-import org.apache.beam.sdk.options.Validation.Required
-import org.apache.beam.sdk.options.{Default, Description, PipelineOptions, PipelineOptionsFactory}
-import org.apache.beam.sdk.transforms.DoFn.ProcessElement
-import org.apache.beam.sdk.transforms.{MapElements, Filter, SimpleFunction, PTransform}
-import org.apache.beam.sdk.values._
-import org.apache.beam.sdk.values.{KV, PCollection}
-import javax.xml.bind.annotation.{XmlRootElement, XmlAccessorType, XmlAccessType, XmlElement}
+import org.apache.beam.sdk.io.xml.XmlIO
+import org.apache.beam.sdk.options.PipelineOptions
+import org.apache.beam.sdk.transforms.PTransform
+import org.apache.beam.sdk.values.{PCollection, _}
+import org.apache.commons.compress.compressors.CompressorStreamFactory
+import org.wiki.load.models._
 
 object WordCount {
 
@@ -27,68 +24,62 @@ object WordCount {
 
     val sc = ScioContext(opts)
 
-    var pipeline: Pipeline = sc.pipeline
+    val firstLine = getBufferedReaderForCompressedFile(INPUT_FILE).readLine()
+    val language: String = Utils.getLanguageFromXMLHeader(firstLine)
+    val languageSideIn = sc.parallelize(Seq(language)).asSingletonSideInput
 
-    var xmlRead = XmlIO.read().from(INPUT_FILE).withRootElement(ROOT_ELEMENT).withRecordElement(RECORD_ELEMENT).withRecordClass(classOf[WikiPage])
+    val xmlRead = XmlIO.read().from(INPUT_FILE).withRootElement(ROOT_ELEMENT).withRecordElement(RECORD_ELEMENT).withRecordClass(classOf[WikiPage])
 
-    var xmlWrite: PTransform[PCollection[Page], PDone] = XmlIO.write().withRootElement(ROOT_ELEMENT).withRecordClass(classOf[Page]).to(OUTPUT)
+    val xmlWrite: PTransform[PCollection[Page], PDone] = XmlIO.write().withRootElement(ROOT_ELEMENT).withRecordClass(classOf[Page]).to(OUTPUT)
 
-    // var transformPages: PTransform[PCollection[WikiPage], PCollection[Page]] = MapElements.via(new ProcessPage)
-
-    sc
+    val filteredPages: SCollection[WikiPage] = sc
       .customInput("fromXML", xmlRead)
       .filter((v: WikiPage) => v.ns == ARTICLE_NAMESPACE)
-      .map(WikiTransforms.transformPage)
+    
+    val languagePages: SCollection[WikiPage] =  filteredPages
+        .withSideInputs(languageSideIn)
+        .flatMap {
+          (line, ctx) =>
+            val language: String = ctx(languageSideIn)
+            Seq(line.copy(language = language))
+        }
+      .toSCollection
+
+   
+    languagePages.map(WikiTransforms.transform)
       .saveAsCustomOutput("toXML", xmlWrite)
 
     sc.pipeline.run().waitUntilFinish()
+  }
+
+  def getBufferedReaderForCompressedFile (fileIn: String): BufferedReader = {
+    val fin: FileInputStream = new FileInputStream(fileIn)
+    val bis: BufferedInputStream = new BufferedInputStream(fin)
+    val input = new CompressorStreamFactory().createCompressorInputStream(bis)
+    new BufferedReader(new InputStreamReader(input))
+  }
+
+}
+
+object Utils {
+  def getLanguageFromXMLHeader(head: String): String = {
+    val start = head.indexOf("xml:lang")
+    head.substring(start+10, start+12)
   }
 }
 
 // ======================================= Transforms =============================================
 
 object WikiTransforms {
-  def transformPage(input: WikiPage): Page = {
-    Page(id=input.id, namespace=input.ns, title=input.title, revisionCount=input.revision.length, revision=input.revision.map(rev => transformRevision(rev)))
+  def transform(input: WikiPage): Page = {
+    Page(wikiId=input.id, language=input.language, namespace=input.ns, title=input.title, revisionCount=input.revision.length, revision=input.revision.map(rev => transformRevision(rev, input)))
   }
 
-  def transformRevision(input: WikiRevision): Revision = {
-    Revision(id=input.id, timestamp=input.timestamp, sha1=input.sha1, textLength=input.text.length, text=input.text, contributor=transformContributor(input.contributor))
+  def transformRevision(input: WikiRevision, page: WikiPage): Revision = {
+    Revision(wikiId=input.id, language=page.language, pageId=page.id, timestamp=input.timestamp, sha1=input.sha1, textLength=input.text.length, text=input.text, contributor=transformContributor(input.contributor))
   }
 
   def transformContributor(input: WikiContributor): WikiContributor = {
     input
   }
-}
-
-// ==== Wiki Classes ====
-@XmlRootElement(name = "page")
-@XmlAccessorType(XmlAccessType.FIELD)
-case class WikiPage(id: Int, ns: Int, title: String, @XmlElement(name="revision") revision: Array[WikiRevision]) {
-  def this() = this(0, 0, "", new Array[WikiRevision](0))
-}
-
-@XmlRootElement(name = "revision")
-@XmlAccessorType(XmlAccessType.FIELD)
-case class WikiRevision(id: Int, timestamp: String, model: String, format: String, sha1: String, text: String, contributor: WikiContributor) {
-  def this() = this(id=0, timestamp="", model="", format="", sha1="", text="", contributor=new WikiContributor)
-}
-
-@XmlRootElement(name="contributor")
-@XmlAccessorType(XmlAccessType.FIELD)
-case class WikiContributor(id: Int, ip: String, username: String) {
-  def this() = this(id=0, ip="", username="")
-}
-
-// ==== Classes ====
-@XmlRootElement(name="page")
-@XmlAccessorType(XmlAccessType.FIELD)
-case class Page(id: Int, namespace: Int, title: String, revisionCount: Int, @XmlElement(name="revision") revision: Array[Revision]) {
-  def this() = this(id=0, namespace=0, title="", revisionCount=0, revision=new Array[Revision](0))
-}
-
-@XmlRootElement(name="revision")
-@XmlAccessorType(XmlAccessType.FIELD)
-case class Revision(id: Int, timestamp: String, sha1: String, textLength: Int, text: String, contributor: WikiContributor) {
-  def this() = this(id=0, timestamp="", sha1="", textLength=0, text="", contributor=new WikiContributor)
 }
