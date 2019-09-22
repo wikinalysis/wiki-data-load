@@ -4,12 +4,12 @@ name := "beam-scala-examples"
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.9"
 
 lazy val scalaMainVersion = "2.12"
 lazy val beamVersion = "2.11.0"
 lazy val slf4jVersion = "1.7.25"
-lazy val scalaTestVersion = "3.0.4"
+lazy val scalaTestVersion = "3.0.8"
 lazy val javaxVersion = "2.2.11"
 lazy val scioVersion = "0.7.4"
 
@@ -37,8 +37,11 @@ libraryDependencies ++= Seq(
 
 assemblyMergeStrategy in assembly := {
   case "META-INF/io.netty.versions.properties" => MergeStrategy.first
-  case PathList("META-INF", "native", xs@_*) => MergeStrategy.first // for io.netty
-  case PathList("META-INF", "services", xs@_*) => MergeStrategy.filterDistinctLines // for IOChannelFactory
-  case PathList("META-INF", xs@_*) => MergeStrategy.discard // otherwise google's repacks blow up
+  case PathList("META-INF", "native", xs @ _*) =>
+    MergeStrategy.first // for io.netty
+  case PathList("META-INF", "services", xs @ _*) =>
+    MergeStrategy.filterDistinctLines // for IOChannelFactory
+  case PathList("META-INF", xs @ _*) =>
+    MergeStrategy.discard // otherwise google's repacks blow up
   case _ => MergeStrategy.first
 }
