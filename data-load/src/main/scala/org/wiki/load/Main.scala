@@ -27,8 +27,11 @@ object WordCount {
     val ROOT_ELEMENT = "mediawiki";
     val ARTICLE_NAMESPACE = 0
     val INPUT_FILE =
-      args.getOrElse("inputFile", "tnwiki-20190801-pages-meta-current.xml.bz2")
-    val OUTPUT = args.getOrElse("output", "tmp/output")
+      args.getOrElse(
+        "inputFile",
+        "tnwiki-20190720-pages-articles-multistream.xml.bz2"
+      )
+    val OUTPUT = args.getOrElse("output", "tmp/page")
 
     val sc = ScioContext(opts)
 
@@ -42,27 +45,38 @@ object WordCount {
       .withRecordElement(RECORD_ELEMENT)
       .withRecordClass(classOf[WikiPage])
 
-    val xmlWrite: PTransform[PCollection[Page], PDone] = XmlIO
+    val xmlWritePages: PTransform[PCollection[Page], PDone] = XmlIO
       .write()
       .withRootElement(ROOT_ELEMENT)
       .withRecordClass(classOf[Page])
       .to(OUTPUT)
 
+    val xmlWriteRevisions: PTransform[PCollection[Revision], PDone] = XmlIO
+      .write()
+      .withRootElement(ROOT_ELEMENT)
+      .withRecordClass(classOf[Revision])
+      .to("tmp/revision")
+
     val filteredPages: SCollection[WikiPage] = sc
       .customInput("fromXML", xmlRead)
       .filter((v: WikiPage) => v.ns == ARTICLE_NAMESPACE)
 
-    val languagePages: SCollection[WikiPage] = filteredPages
+    val languagePages: SCollection[Page] = filteredPages
       .withSideInputs(languageSideIn)
       .flatMap { (line, ctx) =>
         val language: String = ctx(languageSideIn)
         Seq(line.copy(language = language))
       }
       .toSCollection
-
-    languagePages
       .map(WikiTransform.transform)
-      .saveAsCustomOutput("toXML", xmlWrite)
+
+    val pagesOnly = languagePages
+      .map((v: Page) => v.copy(revision = Array[Revision]()))
+      .saveAsCustomOutput("toXML", xmlWritePages)
+
+    val revisionsOnly = languagePages
+      .flatMap((v: Page) => v.revision)
+      .saveAsCustomOutput("toXml", xmlWriteRevisions)
 
     sc.pipeline.run().waitUntilFinish()
   }

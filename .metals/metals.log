@@ -1,3 +1,47 @@
 INFO  time: initialize in 0.34s
 WARN  no build tool detected in workspace '/Users/kevin.rocker/Developer/wikinalysis'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
 WARN  no build target: /Users/kevin.rocker/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+INFO  time: initialize in 1.64s
+WARN  no build tool detected in workspace '/home/kevin/Developer/wikinalysis'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/models/Models.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+INFO  no build target: using presentation compiler with only scala-library
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+Exception in thread "pool-1-thread-5" java.lang.InterruptedException
+	at scala.meta.internal.metals.FutureCancelToken.checkCanceled(FutureCancelToken.scala:20)
+	at scala.meta.internal.mtags.MtagsEnrichments$XtensionCancelChecker.isCancelled(MtagsEnrichments.scala:354)
+	at scala.meta.internal.metals.FormattingProvider.$anonfun$isCancelled$1(FormattingProvider.scala:59)
+	at scala.meta.internal.metals.FormattingProvider.$anonfun$isCancelled$1$adapted(FormattingProvider.scala:59)
+	at scala.Option.exists(Option.scala:376)
+	at scala.meta.internal.metals.FormattingProvider.isCancelled(FormattingProvider.scala:59)
+	at scala.meta.internal.metals.FormattingProvider.$anonfun$handleMissingFile$1(FormattingProvider.scala:171)
+	at scala.meta.internal.metals.FormattingProvider.$anonfun$handleMissingFile$1$adapted(FormattingProvider.scala:164)
+	at scala.util.Success.$anonfun$map$1(Try.scala:255)
+	at scala.util.Success.map(Try.scala:213)
+	at scala.concurrent.Future.$anonfun$map$1(Future.scala:292)
+	at scala.concurrent.impl.Promise.liftedTree1$1(Promise.scala:33)
+	at scala.concurrent.impl.Promise.$anonfun$transform$1(Promise.scala:33)
+	at scala.concurrent.impl.CallbackRunnable.run(Promise.scala:64)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1135)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:844)
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/transforms/WikiTransform.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/utils/LanguageReader.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/transforms/WikiTransform.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+Oct 14, 2019 5:51:14 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 348
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+ERROR scalafmt: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala:74: error: illegal start of simple expression
+      .map((v: Page) => v.copy(revision = []))
+                                          ^
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/Main.scala
+WARN  no build target: /home/kevin/Developer/wikinalysis/data-load/src/main/scala/org/wiki/load/transforms/WikiTransform.scala
