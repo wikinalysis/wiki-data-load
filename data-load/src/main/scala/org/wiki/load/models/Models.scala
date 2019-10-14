@@ -63,7 +63,7 @@ case class Page(
     namespace: Int,
     title: String,
     language: String,
-    @XmlJavaTypeAdapter(classOf[IntOptionAdapter]) latest: Option[Int],
+    latest: Int,
     revisionCount: Int,
     @XmlElement(name = "revision") revision: Array[Revision]
 ) {
@@ -73,7 +73,7 @@ case class Page(
       namespace = 0,
       title = "",
       language = "",
-      latest = None,
+      latest = 0,
       revisionCount = 0,
       revision = new Array[Revision](0)
     )
@@ -88,7 +88,7 @@ case class Revision(
     timestamp: String,
     sha1: String,
     text: String,
-    contributor: WikiContributor
+    contributor: Contributor
 ) {
   def this() =
     this(
@@ -98,6 +98,18 @@ case class Revision(
       timestamp = "",
       sha1 = "",
       text = "",
-      contributor = new WikiContributor
+      contributor = new Contributor
     )
+}
+
+@XmlRootElement(name = "contributor")
+@XmlAccessorType(XmlAccessType.FIELD)
+case class Contributor(
+    wikiId: Int,
+    ip: String,
+    username: String,
+    anonymous: Boolean
+) {
+  def this() =
+    this(wikiId = 0, ip = "", username = "", anonymous = false)
 }

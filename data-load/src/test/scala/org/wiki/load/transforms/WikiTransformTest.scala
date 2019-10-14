@@ -42,7 +42,7 @@ class WikiTransformTest extends FlatSpec {
 
   it should "put latest revision ID in `latest` field" in {
     val newPage = WikiTransform.transform(fixture.wikiPage)
-    assert(newPage.latest == Some(2))
+    assert(newPage.latest == 2)
   }
 
   it should "add latest ID when only one revision present" in {
@@ -60,7 +60,20 @@ class WikiTransformTest extends FlatSpec {
           )
         )
       )
-    assert(WikiTransform.transform(testPage).latest == Some(2))
+    assert(WikiTransform.transform(testPage).latest == 2)
+  }
+
+  it should "add the language to revisions" in {
+    val testPage = fixture.wikiPage.copy(language = "de")
+    assert(WikiTransform.transform(testPage).revision(0).language == "de")
+  }
+
+  it should "default latest ID to 0" in {
+    val testPage =
+      fixture.wikiPage.copy(
+        revision = Array()
+      )
+    assert(WikiTransform.transform(testPage).latest == 0)
   }
 
   it should "put the page ID on the revision objects" in {

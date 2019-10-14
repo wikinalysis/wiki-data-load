@@ -11,8 +11,8 @@ object WikiTransform {
       revisionCount = input.revision.length,
       latest =
         if (input.revision.nonEmpty)
-          Some(input.revision.maxBy(rev => rev.timestamp).id)
-        else None,
+          input.revision.maxBy(rev => rev.timestamp).id
+        else 0,
       revision = input.revision.map(rev => transformRevision(rev, input))
     )
   }
@@ -29,7 +29,12 @@ object WikiTransform {
     )
   }
 
-  def transformContributor(input: WikiContributor): WikiContributor = {
-    input
+  def transformContributor(input: WikiContributor): Contributor = {
+    Contributor(
+      wikiId = input.id,
+      ip = input.ip,
+      username = input.username,
+      anonymous = false
+    )
   }
 }
