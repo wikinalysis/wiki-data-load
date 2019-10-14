@@ -20,4 +20,5 @@ tmp/
 # IDE Files
 .idea
 .metals/
-.bloop/
+.bloop
+.vscode
