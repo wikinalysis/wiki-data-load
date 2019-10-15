@@ -18,7 +18,7 @@ import org.wiki.load.models._
 import org.wiki.load.transforms.WikiTransform
 import org.wiki.load.utils.LanguageReader
 
-object WordCount {
+object WikiReader {
 
   def main(cmdlineArgs: Array[String]): Unit = {
     val (opts, args) = ScioContext.parseArguments[PipelineOptions](cmdlineArgs)

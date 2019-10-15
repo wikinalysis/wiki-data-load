@@ -1,6 +1,6 @@
-organization := "org.apache.beam"
+organization := "org.wiki.load"
 
-name := "beam-scala-examples"
+name := "Wikipedia XML Processor"
 
 version := "1.0-SNAPSHOT"
 
