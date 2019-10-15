@@ -15,7 +15,7 @@ import org.apache.beam.sdk.transforms.PTransform
 import org.apache.beam.sdk.values.{PCollection, _}
 import org.apache.commons.compress.compressors.CompressorStreamFactory
 import org.wiki.load.models._
-import org.wiki.load.transforms.WikiTransform
+import org.wiki.load.transforms._
 import org.wiki.load.utils.LanguageReader
 
 object WikiReader {
@@ -25,7 +25,6 @@ object WikiReader {
 
     val RECORD_ELEMENT = "page";
     val ROOT_ELEMENT = "mediawiki";
-    val ARTICLE_NAMESPACE = 0
     val INPUT_FILE =
       args.getOrElse(
         "inputFile",
@@ -33,51 +32,17 @@ object WikiReader {
       )
     val OUTPUT = args.getOrElse("output", "tmp/page")
 
-    val sc = ScioContext(opts)
+    val config: WikiReaderConfig =
+      new WikiReaderConfig(
+        rootElement = ROOT_ELEMENT,
+        outputLocation = "tmp/",
+        inputFile = INPUT_FILE,
+        stagingLocation = "",
+        databaseId = "",
+        instanceId = "",
+        projectId = ""
+      )
 
-    val language: String = LanguageReader.getLanguageFromXmlFile(INPUT_FILE)
-    val languageSideIn = sc.parallelize(Seq(language)).asSingletonSideInput
-
-    val xmlRead = XmlIO
-      .read()
-      .from(INPUT_FILE)
-      .withRootElement(ROOT_ELEMENT)
-      .withRecordElement(RECORD_ELEMENT)
-      .withRecordClass(classOf[WikiPage])
-
-    val xmlWritePages: PTransform[PCollection[Page], PDone] = XmlIO
-      .write()
-      .withRootElement(ROOT_ELEMENT)
-      .withRecordClass(classOf[Page])
-      .to(OUTPUT)
-
-    val xmlWriteRevisions: PTransform[PCollection[Revision], PDone] = XmlIO
-      .write()
-      .withRootElement(ROOT_ELEMENT)
-      .withRecordClass(classOf[Revision])
-      .to("tmp/revision")
-
-    val filteredPages: SCollection[WikiPage] = sc
-      .customInput("fromXML", xmlRead)
-      .filter((v: WikiPage) => v.ns == ARTICLE_NAMESPACE)
-
-    val languagePages: SCollection[Page] = filteredPages
-      .withSideInputs(languageSideIn)
-      .flatMap { (line, ctx) =>
-        val language: String = ctx(languageSideIn)
-        Seq(line.copy(language = language))
-      }
-      .toSCollection
-      .map(WikiTransform.transform)
-
-    val pagesOnly = languagePages
-      .map((v: Page) => v.copy(revision = Array[Revision]()))
-      .saveAsCustomOutput("toXML", xmlWritePages)
-
-    val revisionsOnly = languagePages
-      .flatMap((v: Page) => v.revision)
-      .saveAsCustomOutput("toXml", xmlWriteRevisions)
-
-    sc.pipeline.run().waitUntilFinish()
+    WikiReaderApp.run(config, opts)
   }
 }
