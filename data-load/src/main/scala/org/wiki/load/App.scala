@@ -8,6 +8,7 @@ import java.io.{
 }
 
 import com.spotify.scio._
+import com.spotify.scio.jdbc._
 import com.spotify.scio.values.SCollection
 import org.apache.beam.sdk.io.xml.XmlIO
 import org.apache.beam.sdk.options.PipelineOptions
@@ -67,5 +68,29 @@ object WikiReaderApp {
       .saveAsCustomOutput("toXml", xmlWriteRevisions)
 
     sc.pipeline.run().waitUntilFinish()
+  }
+
+  def getWriteOptions(
+      connOpts: JdbcConnectionOptions
+  ): JdbcWriteOptions[(String, Long)] = {
+    JdbcWriteOptions(
+      connectionOptions = connOpts,
+      statement = "INSERT INTO result_word_count values(?, ?)",
+      preparedStatementSetter = (kv, s) => {
+        s.setString(1, kv._1); s.setLong(2, kv._2)
+      }
+    );
+  }
+
+  def getConnectionOptions(opts: WikiReaderConfig): JdbcConnectionOptions =
+    JdbcConnectionOptions(
+      username = "admin",
+      password = Some("password"),
+      driverClass = classOf[com.postgresql.jdbc.Driver],
+      connectionUrl = getJdbcUrl(opts)
+    )
+
+  def getJdbcUrl(opts: WikiReaderConfig): String = {
+    s"jdbc:postgresql://localhost:port/wikinalysis?user=admin&password=password"
   }
 }
