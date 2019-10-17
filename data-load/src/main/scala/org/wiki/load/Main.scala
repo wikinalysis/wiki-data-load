@@ -40,6 +40,8 @@ object WikiReader {
         stagingLocation = "",
         databaseId = "",
         instanceId = "",
+        dbUsername = "root",
+        dbPassword = "password",
         projectId = ""
       )
 

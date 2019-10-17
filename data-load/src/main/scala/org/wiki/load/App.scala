@@ -60,7 +60,7 @@ object WikiReaderApp {
 
     val pagesOnly = languagePages
       .map((v: Page) => v.copy(revision = Array[Revision]()))
-      .saveAsCustomOutput("toXML", xmlWritePages)
+      .saveAsJdbc(getWriteOptions(getConnectionOptions(opts)))
 
     val revisionsOnly = languagePages
       .flatMap((v: Page) => v.revision)
@@ -72,25 +72,30 @@ object WikiReaderApp {
 
   def getWriteOptions(
       connOpts: JdbcConnectionOptions
-  ): JdbcWriteOptions[(String, Long)] = {
+  ): JdbcWriteOptions[Page] = {
     JdbcWriteOptions(
       connectionOptions = connOpts,
-      statement = "INSERT INTO result_word_count values(?, ?)",
-      preparedStatementSetter = (kv, s) => {
-        s.setString(1, kv._1); s.setLong(2, kv._2)
+      statement =
+        "INSERT INTO pages (wiki_id, revision_count, title, language, latest) values(?, ?, ?, ?, ?)",
+      preparedStatementSetter = (page: Page, s) => {
+        s.setLong(1, page.wikiId);
+        s.setLong(2, page.revisionCount);
+        s.setString(3, page.title);
+        s.setString(4, page.language);
+        s.setLong(5, page.latest);
       }
     );
   }
 
   def getConnectionOptions(opts: WikiReaderConfig): JdbcConnectionOptions =
     JdbcConnectionOptions(
-      username = "admin",
-      password = Some("password"),
-      driverClass = classOf[com.postgresql.jdbc.Driver],
+      username = opts.dbUsername,
+      password = Some(opts.dbPassword),
+      driverClass = classOf[com.mysql.jdbc.Driver],
       connectionUrl = getJdbcUrl(opts)
     )
 
   def getJdbcUrl(opts: WikiReaderConfig): String = {
-    s"jdbc:postgresql://localhost:port/wikinalysis?user=admin&password=password"
+    s"jdbc:mysql://192.168.0.3:3306/wikinalysis?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
   }
 }

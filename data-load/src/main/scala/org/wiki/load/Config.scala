@@ -7,5 +7,7 @@ case class WikiReaderConfig(
     stagingLocation: String,
     rootElement: String,
     outputLocation: String,
+    dbUsername: String,
+    dbPassword: String,
     inputFile: String
 )

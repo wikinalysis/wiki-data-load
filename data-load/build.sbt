@@ -19,10 +19,13 @@ libraryDependencies ++= Seq(
   "org.sweble.wikitext" % "swc-parser-lazy" % "3.1.9",
   "org.sweble.wikitext" % "swc-engine" % "3.1.9",
   "de.fau.cs.osr.utils" % "utils-parent" % "3.0.8" pomOnly (),
+  "org.postgresql" % "postgresql" % "42.2.7",
   // SCIO
   "io.scalaland" %% "chimney" % "0.3.2",
   "com.spotify" %% "scio-core" % scioVersion,
+  "com.spotify" %% "scio-jdbc" % scioVersion,
   "com.spotify" %% "scio-test" % scioVersion % "test",
+  "mysql" % "mysql-connector-java" % "8.0.17",
   // BEAM and XML
   "org.apache.beam" % "beam-runners-direct-java" % beamVersion,
   "org.apache.beam" % "beam-sdks-java-io-xml" % beamVersion,
