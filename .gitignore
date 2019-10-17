@@ -1,0 +1,7 @@
+tmp/
+target/
+
+.metals/
+.metals
+
+*.bz2
