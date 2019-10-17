@@ -22,3 +22,5 @@ tmp/
 .metals/
 .bloop
 .vscode
+
+*.bz2
