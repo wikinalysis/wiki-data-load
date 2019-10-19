@@ -11,12 +11,16 @@ object RevisionTransform {
       timestamp = input.timestamp,
       contributor = input.contributor,
       textLength = input.text.length,
-      text = new Text(
-        revisionId = input.wikiId,
-        pageId = input.pageId,
-        language = input.language,
-        rawText = input.text
-      )
+      storeText = input.storeText,
+      text =
+        if (input.storeText)
+          new Text(
+            revisionId = input.wikiId,
+            pageId = input.pageId,
+            language = input.language,
+            rawText = input.text
+          )
+        else new Text()
     )
   }
 }

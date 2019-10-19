@@ -28,12 +28,13 @@ object WikiReader {
     val INPUT_FILE =
       args.getOrElse(
         "inputFile",
-        "tnwiki-20190720-pages-articles-multistream.xml.bz2"
+        "tnwiki-20191001-pages-meta-history.xml.bz2"
       )
     val OUTPUT = args.getOrElse("output", "tmp/page")
 
     val config: WikiReaderConfig =
       new WikiReaderConfig(
+        outputXml = true,
         rootElement = ROOT_ELEMENT,
         outputLocation = "tmp/",
         inputFile = INPUT_FILE,

@@ -1,4 +1,5 @@
 package org.wiki.load.models
+
 import javax.xml.bind.annotation.{
   XmlRootElement,
   XmlAccessorType,
@@ -15,6 +16,7 @@ case class FullRevision(
     language: String,
     timestamp: String,
     sha1: String,
+    storeText: Boolean,
     text: Text,
     textLength: Int,
     contributor: Contributor
@@ -25,6 +27,7 @@ case class FullRevision(
       pageId = 0,
       textLength = 0,
       language = "",
+      storeText = false,
       timestamp = "",
       sha1 = "",
       text = new Text,

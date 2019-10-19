@@ -1,6 +1,7 @@
 package org.wiki.load
 
 case class WikiReaderConfig(
+    outputXml: Boolean,
     projectId: String,
     databaseId: String,
     instanceId: String,

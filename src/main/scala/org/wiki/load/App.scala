@@ -16,6 +16,7 @@ import org.apache.beam.sdk.transforms.PTransform
 import org.apache.beam.sdk.values.{PCollection, _}
 import org.apache.commons.compress.compressors.CompressorStreamFactory
 import org.wiki.load.models._
+import org.wiki.load.readers._
 import org.wiki.load.transforms._
 import org.wiki.load.utils.LanguageReader
 
@@ -26,24 +27,15 @@ object WikiReaderApp {
     val language: String = LanguageReader.getLanguageFromXmlFile(opts.inputFile)
     val languageSideIn = sc.parallelize(Seq(language)).asSingletonSideInput
 
-    val xmlRead = XmlIO
-      .read()
-      .from(opts.inputFile)
-      .withRootElement(opts.rootElement)
-      .withRecordElement("page")
-      .withRecordClass(classOf[WikiPage])
+    val connectionOpts = getConnectionOptions(opts)
 
-    val xmlWritePages: PTransform[PCollection[Page], PDone] = XmlIO
-      .write()
-      .withRootElement(opts.rootElement)
-      .withRecordClass(classOf[Page])
-      .to(opts.outputLocation + "pages")
+    val xmlRead = XmlWriter.getXmlReader(opts)
 
-    val xmlWriteRevisions: PTransform[PCollection[FullRevision], PDone] = XmlIO
-      .write()
-      .withRootElement(opts.rootElement)
-      .withRecordClass(classOf[FullRevision])
-      .to(opts.outputLocation + "revisions")
+    val xmlWritePages: PTransform[PCollection[Page], PDone] =
+      XmlWriter.getPageWriter(opts)
+
+    val xmlWriteRevisions: PTransform[PCollection[FullRevision], PDone] =
+      XmlWriter.getRevisionWriter(opts)
 
     val filteredPages: SCollection[WikiPage] = sc
       .customInput("fromXML", xmlRead)
@@ -60,12 +52,18 @@ object WikiReaderApp {
 
     val pagesOnly = languagePages
       .map((v: Page) => v.copy(revision = Array[Revision]()))
-      .saveAsJdbc(getWriteOptions(getConnectionOptions(opts)))
 
     val revisionsOnly = languagePages
       .flatMap((v: Page) => v.revision)
       .map(RevisionTransform.transform)
-      .saveAsCustomOutput("toXml", xmlWriteRevisions)
+
+    if (opts.outputXml) {
+      pagesOnly.saveAsCustomOutput("toXml", xmlWritePages)
+      revisionsOnly.saveAsCustomOutput("toXml", xmlWriteRevisions)
+    } else {
+      pagesOnly.saveAsJdbc(getWriteOptions(connectionOpts))
+      revisionsOnly.saveAsCustomOutput("toXml", xmlWriteRevisions)
+    }
 
     sc.pipeline.run().waitUntilFinish()
   }

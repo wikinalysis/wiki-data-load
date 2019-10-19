@@ -15,6 +15,7 @@ case class Page(
     title: String,
     language: String,
     latest: Int,
+    first: Int,
     revisionCount: Int,
     @XmlElement(name = "revision") revision: Array[Revision]
 ) {
@@ -25,6 +26,7 @@ case class Page(
       title = "",
       language = "",
       latest = 0,
+      first = 0,
       revisionCount = 0,
       revision = new Array[Revision](0)
     )
@@ -37,6 +39,7 @@ case class Revision(
     pageId: Int,
     language: String,
     timestamp: String,
+    storeText: Boolean,
     sha1: String,
     text: String,
     contributor: Contributor
@@ -45,6 +48,7 @@ case class Revision(
     this(
       wikiId = 0,
       pageId = 0,
+      storeText = false,
       language = "",
       timestamp = "",
       sha1 = "",
