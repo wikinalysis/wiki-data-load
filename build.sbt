@@ -16,10 +16,10 @@ lazy val scioVersion = "0.7.4"
 libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-compress" % "1.18",
   // Sweble WikiParser
-  "org.sweble.wikitext" % "swc-parser-lazy" % "3.1.9",
-  "org.sweble.wikitext" % "swc-engine" % "3.1.9",
-  "de.fau.cs.osr.utils" % "utils-parent" % "3.0.8" pomOnly (),
-  "org.postgresql" % "postgresql" % "42.2.7",
+  // "org.sweble.wikitext" % "swc-parser-lazy" % "3.1.9",
+  // "org.sweble.wikitext" % "swc-engine" % "3.1.9",
+  // "de.fau.cs.osr.utils" % "utils-parent" % "3.0.8" pomOnly (),
+  // "org.postgresql" % "postgresql" % "42.2.7",
   // SCIO
   "io.scalaland" %% "chimney" % "0.3.2",
   "com.spotify" %% "scio-core" % scioVersion,

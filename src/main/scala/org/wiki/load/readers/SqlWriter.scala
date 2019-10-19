@@ -10,7 +10,7 @@ object SqlWriter {
     JdbcWriteOptions(
       connectionOptions = connOpts,
       statement =
-        "INSERT INTO pages (wiki_id, revision_count, title, language, latest) values(?, ?, ?, ?, ?)",
+        "INSERT INTO pages (wiki_id, revision_count, title, wiki_language, latest_id, first_id) values(?, ?, ?, ?, ?, ?)",
       preparedStatementSetter = (page: Page, s) => {
         s.setLong(1, page.wikiId);
         s.setLong(2, page.revisionCount);
@@ -28,7 +28,7 @@ object SqlWriter {
     JdbcWriteOptions(
       connectionOptions = connOpts,
       statement =
-        "INSERT INTO revisions (wiki_id, page_id, language, sha1, timestamp, text_length) values(?, ?, ?, ?)",
+        "INSERT INTO revisions (wiki_id, page_id, wiki_language, sha1, created_at, text_length) values(?, ?, ?, ?)",
       preparedStatementSetter = (revision: FullRevision, s) => {
         s.setLong(1, revision.wikiId);
         s.setLong(2, revision.pageId);
@@ -62,12 +62,12 @@ object SqlWriter {
     JdbcWriteOptions(
       connectionOptions = connOpts,
       statement =
-        "INSERT INTO texts (contributor_id, revision_id, language, raw_text) values(?, ?, ?)",
-      preparedStatementSetter = (contributor: Text, s) => {
+        "INSERT INTO contributors (wiki_id, anonymous_user, ip_addr, username) values(?, ?, ?)",
+      preparedStatementSetter = (contributor: Contributor, s) => {
         s.setLong(1, contributor.id);
-        s.setLong(2, text.revisionId);
-        s.setString(3, text.language);
-        s.setString(4, text.rawText);
+        s.setBoolean(1, contributor.anonymous)
+        s.setString(3, contributor.ip)
+        s.setString(4, contributor.username)
       }
     )
   }
