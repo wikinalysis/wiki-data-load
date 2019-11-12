@@ -61,28 +61,11 @@ object WikiReaderApp {
       pagesOnly.saveAsCustomOutput("toXml", xmlWritePages)
       revisionsOnly.saveAsCustomOutput("toXml", xmlWriteRevisions)
     } else {
-      pagesOnly.saveAsJdbc(getWriteOptions(connectionOpts))
-      revisionsOnly.saveAsCustomOutput("toXml", xmlWriteRevisions)
+      pagesOnly.saveAsJdbc(SqlWriter.writePages(connectionOpts))
+      revisionsOnly.saveAsJdbc(SqlWriter.writeRevisions(connectionOpts))
     }
 
     sc.pipeline.run().waitUntilFinish()
-  }
-
-  def getWriteOptions(
-      connOpts: JdbcConnectionOptions
-  ): JdbcWriteOptions[Page] = {
-    JdbcWriteOptions(
-      connectionOptions = connOpts,
-      statement =
-        "INSERT INTO pages (wiki_id, revision_count, title, language, latest) values(?, ?, ?, ?, ?)",
-      preparedStatementSetter = (page: Page, s) => {
-        s.setLong(1, page.wikiId);
-        s.setLong(2, page.revisionCount);
-        s.setString(3, page.title);
-        s.setString(4, page.language);
-        s.setLong(5, page.latest);
-      }
-    );
   }
 
   def getConnectionOptions(opts: WikiReaderConfig): JdbcConnectionOptions =
@@ -90,10 +73,6 @@ object WikiReaderApp {
       username = opts.dbUsername,
       password = Some(opts.dbPassword),
       driverClass = classOf[com.mysql.jdbc.Driver],
-      connectionUrl = getJdbcUrl(opts)
+      connectionUrl = opts.jdbcUrl
     )
-
-  def getJdbcUrl(opts: WikiReaderConfig): String = {
-    s"jdbc:mysql://192.168.0.3:3306/wikinalysis?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC"
-  }
 }

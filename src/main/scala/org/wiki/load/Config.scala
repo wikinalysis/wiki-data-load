@@ -10,5 +10,6 @@ case class WikiReaderConfig(
     outputLocation: String,
     dbUsername: String,
     dbPassword: String,
+    jdbcUrl: String,
     inputFile: String
 )

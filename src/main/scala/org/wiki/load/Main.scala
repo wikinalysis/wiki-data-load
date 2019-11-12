@@ -28,13 +28,13 @@ object WikiReader {
     val INPUT_FILE =
       args.getOrElse(
         "inputFile",
-        "tnwiki-20191001-pages-meta-history.xml.bz2"
+        "tnwiki-20191101-pages-meta-history.xml.bz2"
       )
     val OUTPUT = args.getOrElse("output", "tmp/page")
 
     val config: WikiReaderConfig =
       new WikiReaderConfig(
-        outputXml = true,
+        outputXml = false,
         rootElement = ROOT_ELEMENT,
         outputLocation = "tmp/",
         inputFile = INPUT_FILE,
@@ -42,7 +42,9 @@ object WikiReader {
         databaseId = "",
         instanceId = "",
         dbUsername = "root",
-        dbPassword = "password",
+        dbPassword = "P@ssw0rd",
+        jdbcUrl =
+          "jdbc:mysql://localhost:3307/myschema?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
         projectId = ""
       )
 
