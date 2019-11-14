@@ -10,14 +10,15 @@ object SqlWriter {
     JdbcWriteOptions(
       connectionOptions = connOpts,
       statement =
-        "INSERT INTO pages (wiki_id, revision_count, title, wiki_language, latest_id, first_id) values(?, ?, ?, ?, ?, ?)",
+        "REPLACE INTO pages (wiki_id, revision_count, title, wiki_language, latest_id, first_id, id) values(?, ?, ?, ?, ?, ?, ?)",
       preparedStatementSetter = (page: Page, s) => {
         s.setLong(1, page.wikiId);
         s.setLong(2, page.revisionCount);
         s.setString(3, page.title);
         s.setString(4, page.language);
-        s.setLong(5, page.latest);
-        s.setLong(6, page.first);
+        s.setString(5, page.latest + "-" + page.language);
+        s.setString(6, page.first + "-" + page.language);
+        s.setString(7, page.wikiId + "-" + page.language);
       }
     );
   }
@@ -28,48 +29,52 @@ object SqlWriter {
     JdbcWriteOptions(
       connectionOptions = connOpts,
       statement =
-        "INSERT INTO revisions (wiki_id, page_id, wiki_language, sha1, created_at, text_length, has_text) values(?, ?, ?, ?, ?, ?, ?)",
+        "REPLACE INTO revisions (wiki_id, page_id, wiki_language, sha1, created_at, text_length, has_text, is_first, is_latest, revision_number, id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       preparedStatementSetter = (revision: FullRevision, s) => {
         s.setLong(1, revision.wikiId);
-        s.setLong(2, revision.pageId);
+        s.setString(2, revision.pageId + "-" + revision.language);
         s.setString(3, revision.language);
         s.setString(4, revision.sha1);
         s.setString(5, revision.timestamp);
         s.setLong(6, revision.textLength);
         s.setBoolean(7, revision.storeText);
+        s.setBoolean(8, revision.isFirst);
+        s.setBoolean(9, revision.isLatest);
+        s.setLong(10, revision.revisionNumber);
+        s.setString(11, revision.wikiId + "-" + revision.language);
       }
     )
   }
 
-  def writeText(
-      connOpts: JdbcConnectionOptions
-  ): JdbcWriteOptions[Text] = {
-    JdbcWriteOptions(
-      connectionOptions = connOpts,
-      statement =
-        "INSERT INTO texts (page_id, revision_id, language, raw_text) values(?, ?, ?, ?)",
-      preparedStatementSetter = (text: Text, s) => {
-        s.setLong(1, text.pageId);
-        s.setLong(2, text.revisionId);
-        s.setString(3, text.language);
-        s.setString(4, text.rawText);
-      }
-    )
-  }
+  // def writeText(
+  //     connOpts: JdbcConnectionOptions
+  // ): JdbcWriteOptions[Text] = {
+  //   JdbcWriteOptions(
+  //     connectionOptions = connOpts,
+  //     statement =
+  //       "INSERT INTO texts (page_id, revision_id, language, raw_text) values(?, ?, ?, ?)",
+  //     preparedStatementSetter = (text: Text, s) => {
+  //       s.setLong(1, text.pageId);
+  //       s.setLong(2, text.revisionId);
+  //       s.setString(3, text.language);
+  //       s.setString(4, text.rawText);
+  //     }
+  //   )
+  // }
 
-  def writeContributor(
-      connOpts: JdbcConnectionOptions
-  ): JdbcWriteOptions[Contributor] = {
-    JdbcWriteOptions(
-      connectionOptions = connOpts,
-      statement =
-        "INSERT INTO contributors (wiki_id, anonymous_user, ip_addr, username) values(?, ?, ?, ?)",
-      preparedStatementSetter = (contributor: Contributor, s) => {
-        s.setLong(1, contributor.wikiId);
-        s.setBoolean(1, contributor.anonymous)
-        s.setString(3, contributor.ip)
-        s.setString(4, contributor.username)
-      }
-    )
-  }
+  // def writeContributor(
+  //     connOpts: JdbcConnectionOptions
+  // ): JdbcWriteOptions[Contributor] = {
+  //   JdbcWriteOptions(
+  //     connectionOptions = connOpts,
+  //     statement =
+  //       "INSERT INTO contributors (wiki_id, anonymous_user, ip_addr, username) values(?, ?, ?, ?)",
+  //     preparedStatementSetter = (contributor: Contributor, s) => {
+  //       s.setLong(1, contributor.wikiId);
+  //       s.setBoolean(1, contributor.anonymous)
+  //       s.setString(3, contributor.ip)
+  //       s.setString(4, contributor.username)
+  //     }
+  //   )
+  // }
 }

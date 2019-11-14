@@ -40,6 +40,9 @@ case class Revision(
     language: String,
     timestamp: String,
     storeText: Boolean,
+    isFirst: Boolean,
+    isLatest: Boolean,
+    revisionNumber: Int,
     sha1: String,
     text: String,
     contributor: Contributor
@@ -51,6 +54,9 @@ case class Revision(
       storeText = false,
       language = "",
       timestamp = "",
+      isFirst = true,
+      isLatest = true,
+      revisionNumber = 0,
       sha1 = "",
       text = "",
       contributor = new Contributor

@@ -12,6 +12,9 @@ object RevisionTransform {
       contributor = input.contributor,
       textLength = input.text.length,
       storeText = input.storeText,
+      isFirst = input.isFirst,
+      isLatest = input.isLatest,
+      revisionNumber = input.revisionNumber,
       text =
         if (input.storeText)
           new Text(

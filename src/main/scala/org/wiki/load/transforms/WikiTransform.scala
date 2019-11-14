@@ -20,24 +20,32 @@ object WikiTransform {
       revisionCount = input.revision.length,
       latest = latestRevisionId,
       first = firstRevisionId,
-      revision = input.revision.map(
-        rev => transformRevision(rev, input, firstRevisionId, latestRevisionId)
-      )
+      revision = input.revision
+        .sortBy(_.timestamp)
+        .zipWithIndex
+        .map {
+          case (element, index) =>
+            println(element, index)
+            transformRevision(element, input, index, input.revision.length)
+        }
     )
   }
 
   def transformRevision(
       input: WikiRevision,
       page: WikiPage,
-      id1: Int,
-      id2: Int
+      index: Int,
+      count: Int
   ): Revision = {
     Revision(
       pageId = page.id,
       wikiId = input.id,
       sha1 = input.sha1,
       text = input.text,
-      storeText = input.id == id1 || input.id == id2,
+      storeText = index == 0 || index == count - 1,
+      isFirst = index == 0,
+      isLatest = index == count - 1,
+      revisionNumber = index,
       language = page.language,
       timestamp = input.timestamp,
       contributor = transformContributor(input.contributor)
