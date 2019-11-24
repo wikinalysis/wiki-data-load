@@ -25,7 +25,6 @@ object WikiTransform {
         .zipWithIndex
         .map {
           case (element, index) =>
-            println(element, index)
             transformRevision(element, input, index, input.revision.length)
         }
     )

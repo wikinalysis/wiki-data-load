@@ -7,6 +7,8 @@ import java.io.{
   InputStreamReader
 }
 import org.apache.commons.compress.compressors.CompressorStreamFactory
+import java.util.regex.Pattern
+import java.util.regex.Matcher
 
 object LanguageReader {
   def getLanguageFromXmlFile(fileIn: String): String = {
@@ -23,7 +25,9 @@ object LanguageReader {
   }
 
   def getLanguageFromXMLHeader(head: String): String = {
-    val start = head.indexOf("xml:lang")
-    head.substring(start + 10, start + 12)
+    val pattern: Pattern = Pattern.compile("xml:lang=\"(.*?)\"")
+    val matcher: Matcher = pattern.matcher(head)
+    matcher.find()
+    matcher.group(1)
   }
 }

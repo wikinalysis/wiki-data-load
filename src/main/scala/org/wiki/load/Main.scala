@@ -28,7 +28,7 @@ object WikiReader {
     val INPUT_FILE =
       args.getOrElse(
         "inputFile",
-        "tnwiki-20191101-pages-meta-history.xml.bz2"
+        "pihwiki-20191101-pages-meta-history.xml.bz2"
       )
     val OUTPUT = args.getOrElse("output", "tmp/page")
 
