@@ -23,6 +23,18 @@ object SqlWriter {
     );
   }
 
+  def writeLanguage(
+      connOpts: JdbcConnectionOptions
+  ): JdbcWriteOptions[String] = {
+    JdbcWriteOptions(
+      connectionOptions = connOpts,
+      statement = "REPLACE INTO languages (id) VALUES (?)",
+      preparedStatementSetter = (language: String, s) => {
+        s.setString(1, language)
+      }
+    )
+  }
+
   def writeRevisions(
       connOpts: JdbcConnectionOptions
   ): JdbcWriteOptions[FullRevision] = {

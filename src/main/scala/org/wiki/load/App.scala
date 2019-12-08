@@ -61,6 +61,7 @@ object WikiReaderApp {
       pagesOnly.saveAsCustomOutput("toXml", xmlWritePages)
       revisionsOnly.saveAsCustomOutput("toXml", xmlWriteRevisions)
     } else {
+      languageSideIn.saveAsJdbc(SqlWriter.writeLanguage(connectionOpts))
       pagesOnly.saveAsJdbc(SqlWriter.writePages(connectionOpts))
       revisionsOnly.saveAsJdbc(SqlWriter.writeRevisions(connectionOpts))
     }
