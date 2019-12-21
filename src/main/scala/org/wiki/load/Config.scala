@@ -4,7 +4,6 @@ case class WikiReaderConfig(
     outputXml: Boolean,
     projectId: String,
     databaseId: String,
-    instanceId: String,
     stagingLocation: String,
     rootElement: String,
     outputLocation: String,

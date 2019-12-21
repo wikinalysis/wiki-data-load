@@ -25,7 +25,8 @@ object WikiReaderApp {
     val sc = ScioContext(scOpts)
 
     val language: String = LanguageReader.getLanguageFromXmlFile(opts.inputFile)
-    val languageSideIn = sc.parallelize(Seq(language)).asSingletonSideInput
+    val languageOnly = sc.parallelize(Seq(language))
+    val languageSideIn = languageOnly.asSingletonSideInput
 
     val connectionOpts = getConnectionOptions(opts)
 
@@ -61,7 +62,9 @@ object WikiReaderApp {
       pagesOnly.saveAsCustomOutput("toXml", xmlWritePages)
       revisionsOnly.saveAsCustomOutput("toXml", xmlWriteRevisions)
     } else {
-      languageSideIn.saveAsJdbc(SqlWriter.writeLanguage(connectionOpts))
+      languageOnly.saveAsJdbc(
+        SqlWriter.writeLanguage(connectionOpts)
+      )
       pagesOnly.saveAsJdbc(SqlWriter.writePages(connectionOpts))
       revisionsOnly.saveAsJdbc(SqlWriter.writeRevisions(connectionOpts))
     }

@@ -25,12 +25,14 @@ object WikiReader {
 
     val RECORD_ELEMENT = "page";
     val ROOT_ELEMENT = "mediawiki";
-    val INPUT_FILE =
-      args.getOrElse(
-        "inputFile",
-        "pihwiki-20191101-pages-meta-history.xml.bz2"
-      )
-    val OUTPUT = args.getOrElse("output", "tmp/page")
+
+    val INPUT_FILE = args.required("inputFile")
+    val OUTPUT = args.required("output")
+    val DB_PASS = args.required("dbPassword")
+    val CONNECTION_NAME = args.required("connectionName")
+
+    val DB_USER = args.getOrElse("dbUser", "root")
+    val DB_NAME = args.getOrElse("dbName", "wikidata")
 
     val config: WikiReaderConfig =
       new WikiReaderConfig(
@@ -39,15 +41,19 @@ object WikiReader {
         outputLocation = "tmp/",
         inputFile = INPUT_FILE,
         stagingLocation = "",
-        databaseId = "",
-        instanceId = "",
-        dbUsername = "root",
-        dbPassword = "P@ssw0rd",
-        jdbcUrl =
-          "jdbc:mysql://localhost:3307/myschema?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+        databaseId = DB_NAME,
+        dbUsername = DB_USER,
+        dbPassword = DB_PASS,
+        jdbcUrl = getJdbcUrl(DB_NAME, CONNECTION_NAME),
         projectId = ""
       )
 
     WikiReaderApp.run(config, opts)
+  }
+
+  def getJdbcUrl(dbName: String, connectionName: String): String = {
+    s"jdbc:mysql://google/${dbName}?" +
+      s"cloudSqlInstance=${connectionName}&" +
+      s"socketFactory=com.google.cloud.sql.mysql.SocketFactory"
   }
 }
