@@ -24,22 +24,14 @@ object WikiReaderApp {
   def run(opts: WikiReaderConfig, scOpts: PipelineOptions): Unit = {
     val sc = ScioContext(scOpts)
 
-    val language: String = LanguageReader.getLanguageFromXmlFile(opts.inputFile)
+    val language = opts.language
     val languageOnly = sc.parallelize(Seq(language))
     val languageSideIn = languageOnly.asSingletonSideInput
 
     val connectionOpts = getConnectionOptions(opts)
 
-    val xmlRead = XmlWriter.getXmlReader(opts)
-
-    val xmlWritePages: PTransform[PCollection[Page], PDone] =
-      XmlWriter.getPageWriter(opts)
-
-    val xmlWriteRevisions: PTransform[PCollection[FullRevision], PDone] =
-      XmlWriter.getRevisionWriter(opts)
-
     val filteredPages: SCollection[WikiPage] = sc
-      .customInput("fromXML", xmlRead)
+      .customInput("fromXML", XmlWriter.getXmlReader(opts))
       .filter((v: WikiPage) => v.ns == 0)
 
     val languagePages: SCollection[Page] = filteredPages
@@ -58,16 +50,11 @@ object WikiReaderApp {
       .flatMap((v: Page) => v.revision)
       .map(RevisionTransform.transform)
 
-    if (opts.outputXml) {
-      pagesOnly.saveAsCustomOutput("toXml", xmlWritePages)
-      revisionsOnly.saveAsCustomOutput("toXml", xmlWriteRevisions)
-    } else {
-      languageOnly.saveAsJdbc(
-        SqlWriter.writeLanguage(connectionOpts)
-      )
-      pagesOnly.saveAsJdbc(SqlWriter.writePages(connectionOpts))
-      revisionsOnly.saveAsJdbc(SqlWriter.writeRevisions(connectionOpts))
-    }
+    languageOnly.saveAsJdbc(
+      SqlWriter.writeLanguage(connectionOpts)
+    )
+    pagesOnly.saveAsJdbc(SqlWriter.writePages(connectionOpts))
+    revisionsOnly.saveAsJdbc(SqlWriter.writeRevisions(connectionOpts))
 
     sc.pipeline.run().waitUntilFinish()
   }

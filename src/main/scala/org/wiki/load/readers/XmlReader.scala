@@ -17,26 +17,4 @@ object XmlWriter {
       .withRecordElement("page")
       .withRecordClass(classOf[WikiPage])
   }
-
-  def getPageWriter(
-      opts: WikiReaderConfig
-  ): PTransform[PCollection[Page], PDone] = {
-    Page
-    XmlIO
-      .write()
-      .withRootElement(opts.rootElement)
-      .withRecordClass(classOf[Page])
-      .to(opts.outputLocation + "pages")
-  }
-
-  def getRevisionWriter(
-      opts: WikiReaderConfig
-  ): PTransform[PCollection[FullRevision], PDone] = {
-    Page
-    XmlIO
-      .write()
-      .withRootElement(opts.rootElement)
-      .withRecordClass(classOf[FullRevision])
-      .to(opts.outputLocation + "revisions")
-  }
 }

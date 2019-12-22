@@ -57,36 +57,4 @@ object SqlWriter {
       }
     )
   }
-
-  // def writeText(
-  //     connOpts: JdbcConnectionOptions
-  // ): JdbcWriteOptions[Text] = {
-  //   JdbcWriteOptions(
-  //     connectionOptions = connOpts,
-  //     statement =
-  //       "INSERT INTO texts (page_id, revision_id, language, raw_text) values(?, ?, ?, ?)",
-  //     preparedStatementSetter = (text: Text, s) => {
-  //       s.setLong(1, text.pageId);
-  //       s.setLong(2, text.revisionId);
-  //       s.setString(3, text.language);
-  //       s.setString(4, text.rawText);
-  //     }
-  //   )
-  // }
-
-  // def writeContributor(
-  //     connOpts: JdbcConnectionOptions
-  // ): JdbcWriteOptions[Contributor] = {
-  //   JdbcWriteOptions(
-  //     connectionOptions = connOpts,
-  //     statement =
-  //       "INSERT INTO contributors (wiki_id, anonymous_user, ip_addr, username) values(?, ?, ?, ?)",
-  //     preparedStatementSetter = (contributor: Contributor, s) => {
-  //       s.setLong(1, contributor.wikiId);
-  //       s.setBoolean(1, contributor.anonymous)
-  //       s.setString(3, contributor.ip)
-  //       s.setString(4, contributor.username)
-  //     }
-  //   )
-  // }
 }
